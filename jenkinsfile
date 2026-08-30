@@ -25,17 +25,32 @@ pipeline {
         stage('Deploy Local') {
             steps {
 
-                echo 'Stopping old React server...'
+                echo 'Checking port 3000...'
 
                 bat '''
-                    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000 ^| findstr LISTENING') do taskkill /PID %%a /F
+                    netstat -ano | findstr :3000 | findstr LISTENING > nul
+
+                    if %ERRORLEVEL% EQU 0 (
+                        echo Port 3000 is in use.
+                        echo Stopping old React server...
+
+                        for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000 ^| findstr LISTENING') do (
+                            taskkill /PID %%a /F
+                        )
+                    ) else (
+                        echo No old React server found.
+                    )
+
+                    exit /b 0
                 '''
 
                 echo 'Starting new React application...'
 
                 bat '''
-                    start "React-App" /B cmd /c "npx serve -s dist -l 3000"
+                    start "React-App" /B cmd /c "npx serve -s dist -l %APP_PORT%"
                 '''
+
+                echo 'React application deployed successfully.'
             }
         }
     }
@@ -47,6 +62,7 @@ pipeline {
             echo 'REACT LOCAL DEPLOYMENT SUCCESSFUL'
             echo '========================================'
             echo 'Application: http://localhost:3000'
+            echo '========================================'
         }
 
         failure {
@@ -54,6 +70,7 @@ pipeline {
             echo 'REACT DEPLOYMENT FAILED'
             echo '========================================'
             echo 'Check Jenkins Console Output'
+            echo '========================================'
         }
     }
 }
