@@ -36,7 +36,7 @@ pipeline {
                 echo '========================================'
 
                 bat '''
-                    netstat -ano | findstr :3000 | findstr LISTENING > nul
+                    netstat -ano | findstr :3000 | findstr LISTENING
 
                     if %ERRORLEVEL% EQU 0 (
                         echo Port 3000 is currently in use.
@@ -46,8 +46,6 @@ pipeline {
                             echo Stopping process %%a
                             taskkill /PID %%a /F
                         )
-
-                        timeout /t 2 /nobreak > nul
                     ) else (
                         echo No old React server found.
                     )
@@ -61,16 +59,15 @@ pipeline {
 
                 bat '''
                     set JENKINS_NODE_COOKIE=dontKillMe
-
                     start "React-App" /B cmd /c "npx serve -s dist -l %APP_PORT%"
                 '''
 
                 echo '========================================'
-                echo 'Waiting for React server to start...'
+                echo 'Waiting for React server...'
                 echo '========================================'
 
                 bat '''
-                    timeout /t 5 /nobreak > nul
+                    ping 127.0.0.1 -n 6 > nul
                 '''
 
                 echo '========================================'
@@ -92,19 +89,17 @@ pipeline {
     post {
 
         success {
-
             echo '========================================'
             echo 'REACT CI/CD PIPELINE SUCCESSFUL'
             echo '========================================'
-            echo 'Dependencies installed       : SUCCESS'
-            echo 'React Vite build             : SUCCESS'
-            echo 'Local deployment             : SUCCESS'
-            echo 'Application URL              : http://localhost:3000'
+            echo 'Dependencies installed : SUCCESS'
+            echo 'React build            : SUCCESS'
+            echo 'Local deployment       : SUCCESS'
+            echo 'Application URL        : http://localhost:3000'
             echo '========================================'
         }
 
         failure {
-
             echo '========================================'
             echo 'REACT CI/CD PIPELINE FAILED'
             echo '========================================'
