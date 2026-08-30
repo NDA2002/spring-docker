@@ -10,14 +10,20 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
+                echo '========================================'
+                echo 'Installing npm dependencies...'
+                echo '========================================'
+
                 bat 'npm ci'
             }
         }
 
         stage('Build React App') {
             steps {
+                echo '========================================'
                 echo 'Building React Vite application...'
+                echo '========================================'
+
                 bat 'npm run build'
             }
         }
@@ -25,18 +31,23 @@ pipeline {
         stage('Deploy Local') {
             steps {
 
+                echo '========================================'
                 echo 'Checking port 3000...'
+                echo '========================================'
 
                 bat '''
                     netstat -ano | findstr :3000 | findstr LISTENING > nul
 
                     if %ERRORLEVEL% EQU 0 (
-                        echo Port 3000 is in use.
+                        echo Port 3000 is currently in use.
                         echo Stopping old React server...
 
                         for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000 ^| findstr LISTENING') do (
+                            echo Stopping process %%a
                             taskkill /PID %%a /F
                         )
+
+                        timeout /t 2 /nobreak > nul
                     ) else (
                         echo No old React server found.
                     )
@@ -44,13 +55,36 @@ pipeline {
                     exit /b 0
                 '''
 
+                echo '========================================'
                 echo 'Starting new React application...'
+                echo '========================================'
 
                 bat '''
+                    set JENKINS_NODE_COOKIE=dontKillMe
+
                     start "React-App" /B cmd /c "npx serve -s dist -l %APP_PORT%"
                 '''
 
+                echo '========================================'
+                echo 'Waiting for React server to start...'
+                echo '========================================'
+
+                bat '''
+                    timeout /t 5 /nobreak > nul
+                '''
+
+                echo '========================================'
+                echo 'Checking React application...'
+                echo '========================================'
+
+                bat '''
+                    curl --fail http://localhost:%APP_PORT%
+                '''
+
+                echo '========================================'
                 echo 'React application deployed successfully.'
+                echo 'URL: http://localhost:3000'
+                echo '========================================'
             }
         }
     }
@@ -58,18 +92,23 @@ pipeline {
     post {
 
         success {
+
             echo '========================================'
-            echo 'REACT LOCAL DEPLOYMENT SUCCESSFUL'
+            echo 'REACT CI/CD PIPELINE SUCCESSFUL'
             echo '========================================'
-            echo 'Application: http://localhost:3000'
+            echo 'Dependencies installed       : SUCCESS'
+            echo 'React Vite build             : SUCCESS'
+            echo 'Local deployment             : SUCCESS'
+            echo 'Application URL              : http://localhost:3000'
             echo '========================================'
         }
 
         failure {
+
             echo '========================================'
-            echo 'REACT DEPLOYMENT FAILED'
+            echo 'REACT CI/CD PIPELINE FAILED'
             echo '========================================'
-            echo 'Check Jenkins Console Output'
+            echo 'Please check Jenkins Console Output.'
             echo '========================================'
         }
     }
