@@ -2,12 +2,10 @@ pipeline {
     agent any
 
     environment {
-        // =========================================================
-        // 👇 আপনার Docker Hub Username (এখানে 'nitishpaul' বসানো আছে)
-        // =========================================================
+
         DOCKER_HUB_USER = 'nitishpaul'
         
-        // ডকার ইমেজের নাম এবং লোকাল কন্টেইনার সেটিং
+
         IMAGE_NAME      = 'react-hello-world'
         CONTAINER_NAME  = 'react-app-local'
         PORT_MAPPING    = '3000:80'
@@ -38,11 +36,7 @@ pipeline {
                 echo 'Logging in & Pushing to Docker Hub...'
                 echo '========================================'
                 
-                // =========================================================================
-                // ⚠️ নোট: সিকিউরিটির জন্য পাসওয়ার্ড সরাসরি ফাইলে লেখা হয় না।
-                // Jenkins UI-তে তৈরি করা 'docker-hub-credentials' থেকে এটি স্বয়ংক্রিয়ভাবে 
-                // DOCKER_USER এবং DOCKER_PASS ভ্যারিয়েবলে পাসওয়ার্ড নিয়ে নেবে।
-                // =========================================================================
+
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
                     bat "docker push %DOCKER_HUB_USER%/%IMAGE_NAME%:%BUILD_NUMBER%"
