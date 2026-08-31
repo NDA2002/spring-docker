@@ -16,22 +16,22 @@ function App() {
           {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
         </button>
       </header>
-      
+
       <main className="main-content">
         <div className="card">
           <h1 className="title">Hello, World! 🚀</h1>
           <p className="subtitle">
-            Welcome to your brand new <strong>React + Vite</strong> project.
+            hi  i am nitish <strong>React + Vite</strong> project.
           </p>
-          
+
           <div className="interactive-section">
-            <button 
+            <button
               onClick={() => setClickCount((prev) => prev + 1)}
               className="btn btn-primary"
             >
               Click me: {clickCount}
             </button>
-            
+
             {clickCount > 0 && (
               <p className="fade-in">
                 🎉 You have clicked the button {clickCount} {clickCount === 1 ? 'time' : 'times'}!
