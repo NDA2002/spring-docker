@@ -48,7 +48,7 @@ function App() {
           <div className="status-pill v3-pill">🔥 Release v3.0 - Dual CI/CD Enabled</div>
           <h1 className="title">Hello Nitish! 🚀</h1>
           <p className="subtitle">
-            Welcome to your <strong>React + Docker + Jenkins + GitHub Actionssssssssssss</strong> Pipeline
+            Welcome to your <strong>React + Docker + Jenkins + GitHub Actions</strong> Pipeline
           </p>
 
           {/* Dual Pipeline Visualizer */}
