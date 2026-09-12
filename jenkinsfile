@@ -45,49 +45,43 @@ pipeline {
             }
         }
 
-        stage('Deploy Locally (Docker)') {
+        stage('Deploy to Kubernetes (3 Pods + Kong)') {
             steps {
                 echo '========================================'
-                echo 'Deploying container locally...'
+                echo 'Deploying to Kubernetes Cluster (3 Pods)...'
                 echo '========================================'
                 bat '''
                     @echo off
-                    docker ps -q -f name=%CONTAINER_NAME% > container_id.txt
-                    set /p CID=<container_id.txt
-                    del container_id.txt
+                    echo [1/4] Applying Kubernetes Deployment, Service and ConfigMap...
+                    kubectl apply -f k8s/react-deployment.yaml
 
-                    if not "%CID%"=="" (
-                        echo Stopping running container %CONTAINER_NAME%...
-                        docker stop %CONTAINER_NAME%
-                        docker rm %CONTAINER_NAME%
-                    ) else (
-                        echo Container %CONTAINER_NAME% is not running.
-                    )
+                    echo [2/4] Applying Kong API Gateway Ingress and CORS Plugin...
+                    kubectl apply -f k8s/kong-ingress.yaml
 
-                    docker ps -a -q -f name=%CONTAINER_NAME% > container_id.txt
-                    set /p CID_ALL=<container_id.txt
-                    del container_id.txt
+                    echo [3/4] Performing Zero-Downtime Rolling Update on 3 Pods...
+                    kubectl rollout restart deployment/react-app
 
-                    if not "%CID_ALL%"=="" (
-                        echo Removing stopped container %CONTAINER_NAME%...
-                        docker rm %CONTAINER_NAME%
-                    )
+                    echo [4/4] Waiting for all 3 Pods to be ready...
+                    kubectl rollout status deployment/react-app --timeout=90s
 
-                    echo Starting new container %CONTAINER_NAME% on port 3000...
-                    docker run -d --name %CONTAINER_NAME% -p %PORT_MAPPING% %DOCKER_HUB_USER%/%IMAGE_NAME%:latest
+                    echo ========================================
+                    echo Kubernetes Pods Status:
+                    kubectl get pods -l app=react-app -o wide
+                    echo ========================================
                 '''
             }
         }
+
     }
 
     post {
         success {
             echo '========================================'
             echo 'REACT CI/CD PIPELINE SUCCESSFUL'
-            echo '========================================'
             echo 'Docker Image Built : SUCCESS'
             echo 'Docker Hub Push   : SUCCESS'
-            echo 'Local Container   : RUNNING on http://localhost:3000'
+            echo 'Kubernetes 3 Pods : DEPLOYED & HEALTHY'
+            echo 'Kong Gateway Ingress: ACTIVE on http://localhost:8000'
             echo '========================================'
         }
         failure {
