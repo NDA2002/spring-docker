@@ -4,7 +4,6 @@ import './App.css'
 function App() {
   const [theme, setTheme] = useState('dark')
   const [clickCount, setClickCount] = useState(0)
-  const [activeTab, setActiveTab] = useState('pipeline')
   const [healthCheck, setHealthCheck] = useState(null)
 
   const toggleTheme = () => {
@@ -19,10 +18,10 @@ function App() {
   }
 
   const features = [
+    { icon: '🦍', title: 'Kong API Gateway', desc: 'Enterprise Ingress controller managing routing and traffic' },
+    { icon: '☸️', title: 'Kubernetes 3 Pods', desc: 'React app running on 3 live replicas load-balanced by Kong' },
     { icon: '⚡', title: 'GitHub Actions', desc: 'Automated 24/7 Cloud CI/CD runner on GitHub servers' },
-    { icon: '⚙️', title: 'Jenkins CI/CD', desc: 'Automated local build, test, and container deployment' },
-    { icon: '🐳', title: 'Docker Containerized', desc: 'Running inside Nginx Docker container on port 3000' },
-    { icon: '🚀', title: 'Dual Auto Pipeline', desc: 'Pushed to Docker Hub & deployed automatically' }
+    { icon: '⚙️', title: 'Jenkins CI/CD', desc: 'Automated local build, test, and container deployment' }
   ]
 
   return (
