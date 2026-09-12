@@ -2,13 +2,11 @@ pipeline {
     agent any
 
     environment {
-
         DOCKER_HUB_USER = 'nitishpaul'
-        
-
         IMAGE_NAME      = 'react-hello-world'
         CONTAINER_NAME  = 'react-app-local'
         PORT_MAPPING    = '3000:80'
+        KUBECONFIG      = 'C:\\Users\\Nitishpaul\\.kube\\config'
     }
 
     stages {
@@ -52,21 +50,24 @@ pipeline {
                 echo '========================================'
                 bat '''
                     @echo off
+                    set "KUBECONFIG=C:\\Users\\Nitishpaul\\.kube\\config"
+                    echo Using KUBECONFIG: %KUBECONFIG%
+
                     echo [1/4] Applying Kubernetes Deployment, Service and ConfigMap...
-                    kubectl apply -f k8s/react-deployment.yaml
+                    kubectl apply -f k8s/react-deployment.yaml --kubeconfig="%KUBECONFIG%"
 
                     echo [2/4] Applying Kong API Gateway Ingress and CORS Plugin...
-                    kubectl apply -f k8s/kong-ingress.yaml
+                    kubectl apply -f k8s/kong-ingress.yaml --kubeconfig="%KUBECONFIG%"
 
                     echo [3/4] Performing Zero-Downtime Rolling Update on 3 Pods...
-                    kubectl rollout restart deployment/react-app
+                    kubectl rollout restart deployment/react-app --kubeconfig="%KUBECONFIG%"
 
                     echo [4/4] Waiting for all 3 Pods to be ready...
-                    kubectl rollout status deployment/react-app --timeout=90s
+                    kubectl rollout status deployment/react-app --timeout=90s --kubeconfig="%KUBECONFIG%"
 
                     echo ========================================
                     echo Kubernetes Pods Status:
-                    kubectl get pods -l app=react-app -o wide
+                    kubectl get pods -l app=react-app -o wide --kubeconfig="%KUBECONFIG%"
                     echo ========================================
                 '''
             }
