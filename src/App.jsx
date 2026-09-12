@@ -50,31 +50,31 @@ function App() {
             Welcome to your <strong>React + Docker + Jenkins + GitHub Actions</strong> Pipeline
           </p>
 
-          {/* Dual Pipeline Visualizer */}
+          {/* CI/CD Pipeline Visualizer */}
           <div className="pipeline-banner">
             <div className="pipeline-step">
               <span className="step-icon">💻</span>
               <span className="step-label">Git Push</span>
             </div>
             <span className="pipeline-arrow">➔</span>
-            <div className="pipeline-step active-blue">
-              <span className="step-icon">⚡</span>
-              <span className="step-label">GitHub Actions</span>
-            </div>
-            <span className="pipeline-arrow">➔</span>
             <div className="pipeline-step active-orange">
               <span className="step-icon">🏗️</span>
-              <span className="step-label">Jenkins Build</span>
+              <span className="step-label">Jenkins CI</span>
+            </div>
+            <span className="pipeline-arrow">➔</span>
+            <div className="pipeline-step active-blue">
+              <span className="step-icon">🐳</span>
+              <span className="step-label">Docker Build</span>
             </div>
             <span className="pipeline-arrow">➔</span>
             <div className="pipeline-step">
               <span className="step-icon">📦</span>
-              <span className="step-label">Docker Hub</span>
+              <span className="step-label">Docker Hub Push</span>
             </div>
             <span className="pipeline-arrow">➔</span>
             <div className="pipeline-step active">
-              <span className="step-icon">🌐</span>
-              <span className="step-label">Live App</span>
+              <span className="step-icon">☸️</span>
+              <span className="step-label">K8s 3 Pods & Kong</span>
             </div>
           </div>
 
